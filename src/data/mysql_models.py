@@ -106,6 +106,7 @@ class CompanyNewsItem(Base):
     url = Column(String(500), nullable=True)
     source = Column(String(100), nullable=True)
     data_source = Column(String(50), nullable=False)
+    sentiment = Column(String(20), nullable=True)  # 'positive', 'negative', 'neutral'
     created_at = Column(DateTime, default=dt.now if is_sqlite else func.now(), nullable=False)
     updated_at = Column(DateTime, default=dt.now if is_sqlite else func.now(), onupdate=dt.now if is_sqlite else func.now(), nullable=False)
 
