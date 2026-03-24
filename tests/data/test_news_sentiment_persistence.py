@@ -175,3 +175,53 @@ def test_save_company_news_updates_existing_sentiment(cache):
     retrieved = cache.get_company_news("03690.HK", "2026-03-24", "2026-03-24")
     assert len(retrieved) == 1
     assert retrieved[0].sentiment == "positive"
+
+
+from unittest.mock import patch, MagicMock
+
+
+def _make_news(title: str, sentiment=None) -> CompanyNews:
+    return CompanyNews(
+        ticker="03690.HK",
+        title=title,
+        author="Test",
+        source="AKShare",
+        date="2026-03-24T10:00:00",
+        url="https://example.com",
+        sentiment=sentiment,
+    )
+
+
+def test_news_sentiment_agent_writes_back_to_cache():
+    """After LLM analysis, news_sentiment_agent should persist enriched news to cache."""
+    from src.agents.news_sentiment import news_sentiment_agent
+
+    mock_news = [_make_news("美团Q4业绩超预期"), _make_news("港股下跌")]
+
+    state = {
+        "data": {
+            "tickers": ["03690.HK"],
+            "end_date": "2026-03-24",
+            "analyst_signals": {},
+        },
+        "metadata": {"model_name": "test-model", "model_provider": "test"},
+        "messages": [],
+    }
+
+    mock_sentiment_response = MagicMock()
+    mock_sentiment_response.sentiment = "positive"
+    mock_sentiment_response.confidence = 80
+
+    mock_dual_cache = MagicMock()
+
+    with patch("src.agents.news_sentiment.get_company_news", return_value=mock_news), \
+         patch("src.agents.news_sentiment.call_llm", return_value=mock_sentiment_response), \
+         patch("src.agents.news_sentiment._get_dual_cache", return_value=mock_dual_cache):
+
+        news_sentiment_agent(state)
+
+        # Verify set_company_news was called with sentiment-enriched news
+        mock_dual_cache.set_company_news.assert_called_once()
+        saved_news = mock_dual_cache.set_company_news.call_args.args[4]  # 5th positional arg
+        assert any(n.sentiment is not None for n in saved_news), \
+            "At least one news item should have sentiment set after LLM analysis"

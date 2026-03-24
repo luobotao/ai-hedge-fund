@@ -8,7 +8,7 @@ import numpy as np
 import json
 
 from src.graph.state import AgentState, show_agent_reasoning
-from src.tools.api import get_company_news
+from src.tools.api import get_company_news, _get_dual_cache
 from src.utils.api_key import get_api_key_from_state
 from src.utils.llm import call_llm
 from src.utils.progress import progress
@@ -90,6 +90,17 @@ def news_sentiment_agent(state: AgentState, agent_id: str = "news_sentiment_agen
                     news.sentiment = "neutral"
                     sentiment_confidences[id(news)] = 0
                 sentiments_classified_by_llm += 1
+
+              # Persist sentiment-enriched news back to cache (L1 + L2).
+              # Uses end_date as start_date to match the agent's query window
+              # (no start_date was passed to get_company_news above).
+              _get_dual_cache().set_company_news(
+                  ticker,
+                  end_date,
+                  end_date,
+                  100,
+                  company_news,
+              )
 
             # Aggregate sentiment across all articles
             sentiment = pd.Series([n.sentiment for n in company_news]).dropna()
