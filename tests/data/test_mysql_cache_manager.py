@@ -5,22 +5,40 @@ Tests the MySQL cache manager for dual-layer caching (L1 memory + L2 MySQL).
 """
 import pytest
 from datetime import datetime, date, timedelta
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from src.data.mysql_cache import MySQLCacheManager
 from src.data.models import Price, FinancialMetrics, CompanyNews
+import src.data.database as _db_module
 
 
 @pytest.fixture
 def cache_manager():
     """Create a MySQL cache manager with test database."""
-    # Use in-memory SQLite for testing
-    import os
-    os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+    # Create a fresh in-memory SQLite engine with the new schema
+    test_engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
 
+    # Store original engine and SessionLocal to restore later
+    original_engine = _db_module.engine
+    original_session_local = _db_module.SessionLocal
+
+    # Patch the database module to use our test engine
+    _db_module.engine = test_engine
+    _db_module.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+
+    # Create all tables with the new schema (including sentiment column)
+    _db_module.Base.metadata.create_all(bind=test_engine)
+
+    # Create the cache manager (it will use our patched engine)
     manager = MySQLCacheManager()
     yield manager
 
     # Cleanup
     manager.close()
+
+    # Restore original engine and SessionLocal
+    _db_module.engine = original_engine
+    _db_module.SessionLocal = original_session_local
 
 
 class TestMySQLCacheManager:

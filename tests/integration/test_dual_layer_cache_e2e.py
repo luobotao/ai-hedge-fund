@@ -7,12 +7,15 @@ import pytest
 import os
 from datetime import datetime, timedelta
 from unittest.mock import patch, MagicMock
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from src.tools.api import get_prices, get_financial_metrics, get_company_news
 from src.data.dual_cache import get_dual_cache
 from src.data.cache import get_cache
 from src.data.mysql_cache import MySQLCacheManager
 from src.data.models import Price, FinancialMetrics, CompanyNews
+import src.data.database as _db_module
 
 
 @pytest.mark.integration
@@ -20,8 +23,23 @@ from src.data.models import Price, FinancialMetrics, CompanyNews
 @pytest.fixture
 def clean_test_env():
     """Setup clean test environment with in-memory database."""
-    # Use in-memory SQLite for testing
+    # Set DATABASE_URL so DualLayerCacheManager will try to initialize L2
+    original_db_url = os.environ.get("DATABASE_URL")
     os.environ["DATABASE_URL"] = "sqlite:///:memory:"
+
+    # Create a fresh in-memory SQLite engine with the new schema
+    test_engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
+
+    # Store original engine and SessionLocal to restore later
+    original_engine = _db_module.engine
+    original_session_local = _db_module.SessionLocal
+
+    # Patch the database module to use our test engine
+    _db_module.engine = test_engine
+    _db_module.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+
+    # Create all tables with the new schema (including sentiment column)
+    _db_module.Base.metadata.create_all(bind=test_engine)
 
     # Clear L1 cache
     l1_cache = get_cache()
@@ -47,7 +65,15 @@ def clean_test_env():
     # Reset global instance again
     dual_cache_module._dual_cache = None
 
-    os.environ.pop("DATABASE_URL", None)
+    # Restore original engine and SessionLocal
+    _db_module.engine = original_engine
+    _db_module.SessionLocal = original_session_local
+
+    # Restore original DATABASE_URL
+    if original_db_url is None:
+        os.environ.pop("DATABASE_URL", None)
+    else:
+        os.environ["DATABASE_URL"] = original_db_url
 
 
 @pytest.mark.integration
