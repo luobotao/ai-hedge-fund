@@ -391,8 +391,14 @@ class MySQLCacheManager:
                             url=news.url if hasattr(news, "url") else None,
                             source=news.source if hasattr(news, "source") else None,
                             data_source=data_source,
+                            sentiment=news.sentiment if hasattr(news, "sentiment") else None,
                         )
                         session.add(new_news)
+                    else:
+                        # Update sentiment whenever the new value differs (handles None→value and value→value)
+                        new_sentiment = news.sentiment if hasattr(news, "sentiment") else None
+                        if new_sentiment is not None and existing.sentiment != new_sentiment:
+                            existing.sentiment = new_sentiment
 
             logger.debug(f"Saved {len(news_items)} company news records for {ticker}")
 
@@ -438,7 +444,7 @@ class MySQLCacheManager:
                         author="Unknown",  # CompanyNews model requires author field
                         url=result.url or "",
                         source=result.source or "Unknown",
-                        sentiment=None,
+                        sentiment=result.sentiment,
                     )
                     for result in results
                 ]
