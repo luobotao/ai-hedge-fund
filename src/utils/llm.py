@@ -106,58 +106,119 @@ def create_default_response(model_class: type[BaseModel]) -> BaseModel:
     return model_class(**default_values)
 
 
+def _try_parse_json(text: str) -> dict | None:
+    """Try to parse JSON, first strictly then with lenient fixes."""
+    import re
+
+    text = text.strip()
+    if not text:
+        return None
+
+    # Strict parse
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Lenient fixes for common model output issues:
+    # 1. Trailing commas before } or ]
+    fixed = re.sub(r',\s*([}\]])', r'\1', text)
+    # 2. Missing comma between "value" "key" — same line or across lines
+    #    e.g. "confidence": 80 "reasoning": "..."  →  "confidence": 80, "reasoning": "..."
+    fixed = re.sub(r'([\d\w"\]}])\s*\n\s*"', r'\1,\n"', fixed)
+    fixed = re.sub(r'(\d)\s+"', r'\1, "', fixed)
+    fixed = re.sub(r'"\s+"', '", "', fixed)
+    try:
+        return json.loads(fixed)
+    except json.JSONDecodeError:
+        pass
+
+    return None
+
+
 def extract_json_from_response(content: str) -> dict | None:
     """
-    Extracts JSON from response with enhanced robustness.
+    Extracts JSON from LLM response with enhanced robustness.
 
     Handles:
     - Markdown code blocks (```json ... ```)
-    - XML-style tags (<think>, <output>, etc.)
-    - Plain JSON in text
-    - Leading/trailing whitespace
+    - XML-style reasoning tags (<think>, <output>, <reasoning>)
+    - JSON embedded in surrounding text
+    - Minor JSON syntax errors (trailing commas, missing commas)
     """
     import re
 
-    try:
-        # Strategy 1: Try markdown code block first
-        json_start = content.find("```json")
-        if json_start != -1:
-            json_text = content[json_start + 7:]  # Skip past ```json
-            json_end = json_text.find("```")
-            if json_end != -1:
-                json_text = json_text[:json_end].strip()
-                return json.loads(json_text)
+    if not content:
+        return None
 
-        # Strategy 2: Remove common XML-style tags (<think>, <output>, etc.)
-        # Pattern matches: <tag>...</tag> or <tag ...>...</tag>
-        cleaned = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL | re.IGNORECASE)
-        cleaned = re.sub(r'<output>.*?</output>', '', cleaned, flags=re.DOTALL | re.IGNORECASE)
-        cleaned = re.sub(r'<reasoning>.*?</reasoning>', '', cleaned, flags=re.DOTALL | re.IGNORECASE)
+    # Strategy 1: Markdown code block ```json ... ```
+    json_start = content.find("```json")
+    if json_start != -1:
+        json_text = content[json_start + 7:]
+        json_end = json_text.find("```")
+        if json_end != -1:
+            result = _try_parse_json(json_text[:json_end])
+            if result is not None:
+                return result
 
-        # Strategy 3: Find JSON object by looking for balanced braces
-        # Look for the first { and try to find its matching }
-        brace_start = cleaned.find('{')
-        if brace_start != -1:
-            # Find matching closing brace
+    # Strategy 2: Remove XML-style reasoning tags, then extract JSON
+    cleaned = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL | re.IGNORECASE)
+    cleaned = re.sub(r'<output>.*?</output>', '', cleaned, flags=re.DOTALL | re.IGNORECASE)
+    cleaned = re.sub(r'<reasoning>.*?</reasoning>', '', cleaned, flags=re.DOTALL | re.IGNORECASE)
+    # Handle unclosed <think> tags: remove everything from <think> to end of string
+    cleaned = re.sub(r'<think>.*$', '', cleaned, flags=re.DOTALL | re.IGNORECASE)
+    cleaned = cleaned.strip()
+
+    # Strategy 3: Find outermost balanced JSON object { ... }
+    brace_start = cleaned.find('{')
+    if brace_start != -1:
+        brace_count = 0
+        for i in range(brace_start, len(cleaned)):
+            if cleaned[i] == '{':
+                brace_count += 1
+            elif cleaned[i] == '}':
+                brace_count -= 1
+                if brace_count == 0:
+                    result = _try_parse_json(cleaned[brace_start:i + 1])
+                    if result is not None:
+                        return result
+                    break  # Found balanced braces but still invalid; stop scanning
+
+    # Strategy 4: Try parsing the full cleaned content
+    result = _try_parse_json(cleaned)
+    if result is not None:
+        return result
+
+    # Strategy 5: If <think> was present but no JSON found after removal,
+    # the model may have embedded JSON inside the <think> block itself.
+    # Scan for ALL balanced JSON objects and return the last valid one
+    # (reasoning models typically state the final answer last).
+    if '<think>' in content.lower():
+        last_result = None
+        search_start = 0
+        while True:
+            brace_start = content.find('{', search_start)
+            if brace_start == -1:
+                break
             brace_count = 0
-            for i in range(brace_start, len(cleaned)):
-                if cleaned[i] == '{':
+            for i in range(brace_start, len(content)):
+                if content[i] == '{':
                     brace_count += 1
-                elif cleaned[i] == '}':
+                elif content[i] == '}':
                     brace_count -= 1
                     if brace_count == 0:
-                        json_text = cleaned[brace_start:i+1]
-                        return json.loads(json_text)
+                        candidate = _try_parse_json(content[brace_start:i + 1])
+                        if candidate is not None:
+                            last_result = candidate
+                        search_start = i + 1
+                        break
+            else:
+                break
+        if last_result is not None:
+            return last_result
 
-        # Strategy 4: Try to parse the entire cleaned content
-        return json.loads(cleaned.strip())
-
-    except json.JSONDecodeError as e:
-        print(f"JSON decode error: {e}")
-        print(f"Attempted to parse: {content[:500]}...")  # Show first 500 chars
-    except Exception as e:
-        print(f"Error extracting JSON from response: {e}")
-
+    print(f"JSON decode error: could not extract valid JSON from response")
+    print(f"Attempted to parse: {content[:500]}...")
     return None
 
 

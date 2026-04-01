@@ -5,10 +5,14 @@ Supports both SQLite (for development) and MySQL (for production).
 """
 import os
 import threading
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.pool import NullPool
 import logging
+
+# Ensure .env is loaded before reading DATABASE_URL (handles early imports before main.py)
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 

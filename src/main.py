@@ -103,8 +103,14 @@ def run_hedge_fund(
             },
         )
 
+        # Find the portfolio manager's message by name (not positional, since messages may be duplicated)
+        portfolio_msg = next(
+            (m for m in reversed(final_state["messages"]) if getattr(m, "name", None) == "portfolio_manager"),
+            None,
+        )
+        decisions_content = portfolio_msg.content if portfolio_msg else final_state["messages"][-1].content
         return {
-            "decisions": parse_hedge_fund_response(final_state["messages"][-1].content),
+            "decisions": parse_hedge_fund_response(decisions_content),
             "analyst_signals": final_state["data"]["analyst_signals"],
         }
     finally:

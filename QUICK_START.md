@@ -22,6 +22,30 @@ poetry run python src/main.py --ticker 000001.SZ,3690.HK --analysts-all --model 
 poetry run python src/main.py --ticker 000001.SZ --analysts "bill_ackman,charlie_munger" --model "MiniMax-M2.5"
 ```
 
+直接用 shell 重定向即可，但需要注意该项目日志输出到 stderr，正常输出到 stdout：
+
+# 只保存日志（stderr）到文件
+```bash
+poetry run python src/main.py --tickers AAPL --analysts-all --model "deepseek-chat" 2> output.log
+```
+# 只保存正常输出（stdout）到文件
+```bash
+poetry run python src/main.py --tickers AAPL --analysts-all --model "deepseek-chat" > output.log
+```
+# 同时保存 stdout 和 stderr 到同一个文件
+```bash
+poetry run python src/main.py --tickers AAPL --analysts-all --model "deepseek-chat" > output.log 2>&1
+```
+# 同时保存 stdout 和 stderr 到不同文件
+```bash
+poetry run python src/main.py --tickers AAPL --analysts-all --model "deepseek-chat" > stdout.log 2> stderr.log
+```
+# 同时输出到控制台并保存到文件（tee）
+```bash
+poetry run python src/main.py --tickers AAPL --analysts-all --model "deepseek-chat" 2>&1 | tee output.log
+```
+推荐使用最后一条 tee 命令，既能在控制台看到实时输出，又能保存到文件。
+
 ## 查看URL日志
 
 现在运行主程序时，您会看到：
@@ -76,7 +100,7 @@ poetry run python src/main.py --ticker 000001.SZ --analysts "bill_ackman,charlie
 
 ### 1. 看不到URL日志？
 确保 `src/main.py` 中有日志配置：
-```python
+```
 logging.basicConfig(
     level=logging.INFO,
     format='%(message)s',
@@ -104,7 +128,7 @@ export TUSHARE_TOKEN="your_token_here"
 如果不需要某个数据源，可以在对应的adapter中移除：
 
 **CN股票** (`src/markets/cn_stock.py`):
-```python
+```
 data_sources = [
     EastmoneyCurlSource(),  # 保留
     # TushareSource(),      # 注释掉

@@ -50,6 +50,8 @@ class AgentProgress:
             self._flush_pending_updates()
             self.live.stop()
             self.started = False
+            # Ensure a newline after the Live display so subsequent print() output starts on a fresh line
+            print(file=sys.stdout, flush=True)
 
     def _flush_pending_updates(self):
         """Flush any pending updates that were throttled."""
