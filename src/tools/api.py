@@ -170,14 +170,15 @@ def get_prices(ticker: str, start_date: str, end_date: str, api_key: str = None)
         url = f"https://api.financialdatasets.ai/prices/?ticker={ticker}&interval=day&interval_multiplier=1&start_date={start_date}&end_date={end_date}"
         response = _make_api_request(url, headers)
         if response.status_code != 200:
+            logger.warning("Could not fetch prices for %s (HTTP %s)", ticker, response.status_code)
             return []
 
         # Parse response with Pydantic model
         try:
             price_response = PriceResponse(**response.json())
             prices = price_response.prices
-        except Exception as e:
-            logger.warning("Failed to parse price response for %s: %s", ticker, e)
+        except (ValueError, KeyError) as e:
+            logger.warning("Failed to parse price data for %s: %s", ticker, e)
             return []
 
         if not prices:
@@ -455,14 +456,15 @@ def get_insider_trades(
 
             response = _make_api_request(url, headers)
             if response.status_code != 200:
+                logger.warning("Could not fetch insider trades for %s (HTTP %s)", ticker, response.status_code)
                 break
 
             try:
                 data = response.json()
                 response_model = InsiderTradeResponse(**data)
                 insider_trades = response_model.insider_trades
-            except Exception as e:
-                logger.warning("Failed to parse insider trades response for %s: %s", ticker, e)
+            except (ValueError, KeyError) as e:
+                logger.warning("Failed to parse insider trades for %s: %s", ticker, e)
                 break
 
             if not insider_trades:
@@ -641,7 +643,7 @@ def get_market_cap(
             url = f"https://api.financialdatasets.ai/company/facts/?ticker={ticker}"
             response = _make_api_request(url, headers)
             if response.status_code != 200:
-                logger.warning(f"Error fetching company facts: {ticker} - {response.status_code}")
+                logger.warning("Could not fetch company facts for %s (HTTP %s)", ticker, response.status_code)
                 return None
 
             data = response.json()
