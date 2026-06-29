@@ -136,17 +136,29 @@ def _try_parse_json(text: str) -> dict | None:
     return None
 
 
-def extract_json_from_response(content: str) -> dict | None:
+def extract_json_from_response(content) -> dict | None:
     """
     Extracts JSON from LLM response with enhanced robustness.
 
     Handles:
+    - Reasoning model list-form content (Anthropic extended thinking)
     - Markdown code blocks (```json ... ```)
     - XML-style reasoning tags (<think>, <output>, <reasoning>)
     - JSON embedded in surrounding text
     - Minor JSON syntax errors (trailing commas, missing commas)
     """
     import re
+
+    # Reasoning models (e.g. Anthropic extended thinking) return content as a
+    # list of blocks (thinking + text). Concatenate the text blocks.
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if isinstance(block, str):
+                parts.append(block)
+            elif isinstance(block, dict) and block.get("type") == "text":
+                parts.append(block.get("text", ""))
+        content = "\n".join(parts)
 
     if not content:
         return None
