@@ -22,6 +22,7 @@ class ModelProvider(str, Enum):
     DEEPSEEK = "DeepSeek"
     GOOGLE = "Google"
     GROQ = "Groq"
+    KIMI = "Kimi"
     META = "Meta"
     MISTRAL = "Mistral"
     OPENAI = "OpenAI"
@@ -51,6 +52,11 @@ class LLMModel(BaseModel):
         """Check if the model supports JSON mode"""
         if self.is_deepseek() or self.is_gemini():
             return False
+        # Anthropic reasoning models reject forced tool_choice, which is how
+        # langchain-anthropic implements with_structured_output. Route them
+        # through prompt-based JSON extraction instead.
+        if self.is_anthropic_reasoning():
+            return False
         # Only certain Ollama models support JSON mode
         if self.is_ollama():
             return "llama3" in self.model_name or "neural-chat" in self.model_name
@@ -63,9 +69,17 @@ class LLMModel(BaseModel):
         """Check if the model is a DeepSeek model"""
         return self.model_name.startswith("deepseek")
 
+    def is_kimi(self) -> bool:
+        """Check if the model is a Kimi (Moonshot) model"""
+        return self.provider == ModelProvider.KIMI
+
     def is_gemini(self) -> bool:
         """Check if the model is a Gemini model"""
         return self.model_name.startswith("gemini")
+
+    def is_anthropic_reasoning(self) -> bool:
+        """Check if the model is an Anthropic reasoning model (no forced tool use)"""
+        return self.provider == ModelProvider.ANTHROPIC and self.model_name.startswith("claude-fable")
 
     def is_ollama(self) -> bool:
         """Check if the model is an Ollama model"""
@@ -199,6 +213,16 @@ def get_model(model_name: str, model_provider: ModelProvider, api_keys: dict = N
                 }
             }
         )
+    elif model_provider == ModelProvider.KIMI:
+        api_key = (api_keys or {}).get("MOONSHOT_API_KEY") or os.getenv("MOONSHOT_API_KEY") \
+            or (api_keys or {}).get("KIMI_API_KEY") or os.getenv("KIMI_API_KEY")
+        if not api_key:
+            print(f"API Key Error: Please make sure MOONSHOT_API_KEY (or KIMI_API_KEY) is set in your .env file or provided via API keys.")
+            raise ValueError("Kimi API key not found. Please make sure MOONSHOT_API_KEY (or KIMI_API_KEY) is set in your .env file or provided via API keys.")
+        # Kimi exposes an OpenAI-compatible endpoint. Default to the international host;
+        # users in mainland China can override via MOONSHOT_BASE_URL=https://api.moonshot.cn/v1.
+        base_url = os.getenv("MOONSHOT_BASE_URL") or os.getenv("KIMI_BASE_URL") or "https://api.moonshot.ai/v1"
+        return ChatOpenAI(model=model_name, api_key=api_key, base_url=base_url)
     elif model_provider == ModelProvider.XAI:
         api_key = (api_keys or {}).get("XAI_API_KEY") or os.getenv("XAI_API_KEY")
         if not api_key:
