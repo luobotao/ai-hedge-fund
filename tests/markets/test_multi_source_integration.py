@@ -1,15 +1,15 @@
 """Integration tests for multi-source data validation."""
 import pytest
 from unittest.mock import patch
-from src.markets.cn_stock import CNStockAdapter
-from src.markets.hk_stock import HKStockAdapter
-from src.data.validation import DataValidator
+from hedge_fund.markets.cn_stock import CNStockAdapter
+from hedge_fund.markets.hk_stock import HKStockAdapter
+from hedge_fund.data.validation import DataValidator
 
 
 class TestMultiSourceIntegration:
     """Test multi-source integration."""
 
-    @patch('src.markets.sources.akshare_source.AKShareSource.get_prices')
+    @patch('hedge_fund.markets.sources.akshare_source.AKShareSource.get_prices')
     def test_cn_stock_single_source_integration(self, mock_ak_prices):
         """Test CN stock adapter with single source."""
         # Mock AKShare data
@@ -44,8 +44,8 @@ class TestMultiSourceIntegration:
         assert prices[0].close == 10.5
         assert prices[1].close == 11.0
 
-    @patch('src.markets.sources.akshare_source.AKShareSource.get_prices')
-    @patch('src.markets.sources.yfinance_source.YFinanceSource.get_prices')
+    @patch('hedge_fund.markets.sources.akshare_source.AKShareSource.get_prices')
+    @patch('hedge_fund.markets.sources.yfinance_source.YFinanceSource.get_prices')
     def test_hk_stock_multi_source_integration(self, mock_yf_prices, mock_ak_prices):
         """Test HK stock adapter with multiple sources and validation."""
         # Mock AKShare data
@@ -90,8 +90,8 @@ class TestMultiSourceIntegration:
         # Should be weighted average between 101.0 and 101.2
         assert 101.0 <= prices[0].close <= 101.2
 
-    @patch('src.markets.sources.akshare_source.AKShareSource.get_prices')
-    @patch('src.markets.sources.yfinance_source.YFinanceSource.get_prices')
+    @patch('hedge_fund.markets.sources.akshare_source.AKShareSource.get_prices')
+    @patch('hedge_fund.markets.sources.yfinance_source.YFinanceSource.get_prices')
     def test_data_source_fallback(self, mock_yf_prices, mock_ak_prices):
         """Test fallback when primary source fails."""
         # Primary source (AKShare) fails
@@ -119,8 +119,8 @@ class TestMultiSourceIntegration:
         assert len(prices) == 1
         assert prices[0].close == 101.0
 
-    @patch('src.markets.sources.akshare_source.AKShareSource.get_prices')
-    @patch('src.markets.sources.yfinance_source.YFinanceSource.get_prices')
+    @patch('hedge_fund.markets.sources.akshare_source.AKShareSource.get_prices')
+    @patch('hedge_fund.markets.sources.yfinance_source.YFinanceSource.get_prices')
     def test_high_deviation_handling(self, mock_yf_prices, mock_ak_prices):
         """Test handling of high price deviation between sources."""
         # Mock AKShare data
@@ -174,8 +174,8 @@ class TestMultiSourceIntegration:
         assert hk_adapter.normalize_ticker("0700.HK") == "00700"
         assert hk_adapter.normalize_ticker("00700") == "00700"
 
-    @patch('src.markets.sources.akshare_source.AKShareSource.get_financial_metrics')
-    @patch('src.markets.sources.xueqiu_source.XueqiuSource.get_financial_metrics')
+    @patch('hedge_fund.markets.sources.akshare_source.AKShareSource.get_financial_metrics')
+    @patch('hedge_fund.markets.sources.xueqiu_source.XueqiuSource.get_financial_metrics')
     def test_financial_metrics_merging(self, mock_xq_metrics, mock_ak_metrics):
         """Test merging of financial metrics from multiple sources."""
         # Mock AKShare metrics

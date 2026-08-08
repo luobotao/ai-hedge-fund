@@ -5,7 +5,7 @@ MarketAdapter基类测试
 """
 import pytest
 from abc import ABC
-from src.markets.base import MarketAdapter
+from hedge_fund.markets.base import MarketAdapter
 
 
 def test_market_adapter_is_abstract():

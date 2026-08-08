@@ -3,8 +3,8 @@ import pytest
 import time
 from datetime import datetime, timedelta
 
-from src.markets.cn_stock import CNStockAdapter
-from src.markets.sources.eastmoney_source import EastmoneySource
+from hedge_fund.markets.cn_stock import CNStockAdapter
+from hedge_fund.markets.sources.eastmoney_source import EastmoneySource
 
 
 @pytest.mark.integration

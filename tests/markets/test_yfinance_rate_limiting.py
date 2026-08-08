@@ -2,7 +2,7 @@
 import pytest
 import time
 from unittest.mock import Mock, patch, MagicMock
-from src.markets.sources.yfinance_source import YFinanceSource
+from hedge_fund.markets.sources.yfinance_source import YFinanceSource
 
 
 class TestYFinanceRateLimiting:

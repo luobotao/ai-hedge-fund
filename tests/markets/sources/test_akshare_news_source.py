@@ -2,7 +2,7 @@
 import pytest
 from datetime import datetime, timedelta
 
-from src.markets.sources.akshare_news_source import AKShareNewsSource
+from hedge_fund.markets.sources.akshare_news_source import AKShareNewsSource
 
 
 @pytest.fixture

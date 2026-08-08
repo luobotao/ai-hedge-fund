@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
-from src.markets.router import MarketRouter
-from src.tools.api import get_financial_metrics
-from src.data.models import FinancialMetrics
+from hedge_fund.markets.router import MarketRouter
+from hedge_fund.tools.api import get_financial_metrics
+from hedge_fund.data.models import FinancialMetrics
 
 
 def test_market_router_has_get_historical_financial_metrics():
@@ -44,7 +44,7 @@ def _make_metrics_dict(report_period: str) -> dict:
 
 def _mock_cache(mocker):
     """Helper: patch the dual cache to always return None (cache miss)."""
-    mock_cache = mocker.patch("src.tools.api._get_dual_cache")
+    mock_cache = mocker.patch("hedge_fund.tools.api._get_dual_cache")
     mock_cache.return_value.get_financial_metrics.return_value = None
     return mock_cache
 
@@ -54,8 +54,8 @@ def test_get_financial_metrics_returns_single_period_for_ttm(mocker):
     mock_router = MagicMock()
     mock_router.return_value.get_financial_metrics.return_value = _make_metrics_dict("2024-12-31")
 
-    mocker.patch("src.tools.api._get_market_router", mock_router)
-    mocker.patch("src.tools.api._is_us_stock", return_value=False)
+    mocker.patch("hedge_fund.tools.api._get_market_router", mock_router)
+    mocker.patch("hedge_fund.tools.api._is_us_stock", return_value=False)
     _mock_cache(mocker)
 
     results = get_financial_metrics("3690.HK", "2025-01-01", period="ttm", limit=5)
@@ -75,8 +75,8 @@ def test_get_financial_metrics_returns_multi_year_for_annual_with_limit(mocker):
         _make_metrics_dict("2022-12-31"),
     ]
 
-    mocker.patch("src.tools.api._get_market_router", mock_router)
-    mocker.patch("src.tools.api._is_us_stock", return_value=False)
+    mocker.patch("hedge_fund.tools.api._get_market_router", mock_router)
+    mocker.patch("hedge_fund.tools.api._is_us_stock", return_value=False)
     _mock_cache(mocker)
 
     results = get_financial_metrics("3690.HK", "2025-01-01", period="annual", limit=5)
@@ -94,8 +94,8 @@ def test_get_financial_metrics_annual_limit_1_uses_single_period(mocker):
     mock_router = MagicMock()
     mock_router.return_value.get_financial_metrics.return_value = _make_metrics_dict("2024-12-31")
 
-    mocker.patch("src.tools.api._get_market_router", mock_router)
-    mocker.patch("src.tools.api._is_us_stock", return_value=False)
+    mocker.patch("hedge_fund.tools.api._get_market_router", mock_router)
+    mocker.patch("hedge_fund.tools.api._is_us_stock", return_value=False)
     _mock_cache(mocker)
 
     results = get_financial_metrics("3690.HK", "2025-01-01", period="annual", limit=1)
@@ -110,8 +110,8 @@ def test_get_financial_metrics_returns_empty_when_historical_returns_none(mocker
     mock_router = MagicMock()
     mock_router.return_value.get_historical_financial_metrics.return_value = None
 
-    mocker.patch("src.tools.api._get_market_router", mock_router)
-    mocker.patch("src.tools.api._is_us_stock", return_value=False)
+    mocker.patch("hedge_fund.tools.api._get_market_router", mock_router)
+    mocker.patch("hedge_fund.tools.api._is_us_stock", return_value=False)
     _mock_cache(mocker)
 
     results = get_financial_metrics("3690.HK", "2025-01-01", period="annual", limit=5)

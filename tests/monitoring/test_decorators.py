@@ -2,8 +2,8 @@
 
 import pytest
 import time
-from src.monitoring.decorators import monitor_request, retry_with_monitoring
-from src.monitoring.metrics import metrics_collector
+from hedge_fund.monitoring.decorators import monitor_request, retry_with_monitoring
+from hedge_fund.monitoring.metrics import metrics_collector
 
 
 class TestMonitorRequest:

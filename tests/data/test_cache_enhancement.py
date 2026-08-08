@@ -5,9 +5,9 @@ import threading
 import pytest
 from unittest.mock import patch
 
-from src.data.cache import Cache, CacheStats
-from src.data.cache_decorators import cached, get_decorator_cache
-from src.data.cache_cleaner import CacheCleaner
+from hedge_fund.data.cache import Cache, CacheStats
+from hedge_fund.data.cache_decorators import cached, get_decorator_cache
+from hedge_fund.data.cache_cleaner import CacheCleaner
 
 
 @pytest.fixture(autouse=True)

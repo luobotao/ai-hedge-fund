@@ -1,7 +1,7 @@
 """Integration tests for YFinance with real API (optional, slow)."""
 import pytest
 import os
-from src.markets.sources.yfinance_source import YFinanceSource
+from hedge_fund.markets.sources.yfinance_source import YFinanceSource
 
 
 # Mark as slow and skip by default

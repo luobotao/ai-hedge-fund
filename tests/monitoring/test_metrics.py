@@ -1,7 +1,7 @@
 """Tests for metrics collection module."""
 
 import pytest
-from src.monitoring.metrics import DataSourceMetrics, MetricsCollector
+from hedge_fund.monitoring.metrics import DataSourceMetrics, MetricsCollector
 
 
 class TestDataSourceMetrics:

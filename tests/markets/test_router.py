@@ -4,8 +4,8 @@ MarketRouter路由器测试
 测试ticker到适配器的路由逻辑
 """
 import pytest
-from src.markets.router import MarketRouter
-from src.markets.base import MarketAdapter
+from hedge_fund.markets.router import MarketRouter
+from hedge_fund.markets.base import MarketAdapter
 
 
 class MockUSAdapter(MarketAdapter):

@@ -2,8 +2,8 @@
 import pytest
 import requests_mock as rm_module
 from unittest.mock import Mock, patch
-from src.markets.hk_stock import HKStockAdapter
-from src.data.models import Price
+from hedge_fund.markets.hk_stock import HKStockAdapter
+from hedge_fund.data.models import Price
 
 
 class TestHKStockAdapter:
@@ -33,10 +33,10 @@ class TestHKStockAdapter:
         assert adapter.get_yfinance_ticker("01398") == "1398.HK"
         assert adapter.get_yfinance_ticker("700") == "0700.HK"
 
-    @patch("src.markets.sources.akshare_source.AKShareSource.get_prices")
-    @patch("src.markets.sources.eastmoney_source.EastmoneySource.get_prices")
-    @patch("src.markets.sources.sina_finance_source.SinaFinanceSource.get_prices")
-    @patch("src.markets.sources.xueqiu_source.XueqiuSource.get_prices")
+    @patch("hedge_fund.markets.sources.akshare_source.AKShareSource.get_prices")
+    @patch("hedge_fund.markets.sources.eastmoney_source.EastmoneySource.get_prices")
+    @patch("hedge_fund.markets.sources.sina_finance_source.SinaFinanceSource.get_prices")
+    @patch("hedge_fund.markets.sources.xueqiu_source.XueqiuSource.get_prices")
     def test_get_prices_multi_source(self, mock_xq_prices, mock_sina_prices, mock_em_prices, mock_ak_prices):
         """Test getting prices from multiple sources."""
         adapter = HKStockAdapter()
@@ -77,8 +77,8 @@ class TestHKStockAdapter:
         # Primary source should be called
         mock_xq_prices.assert_called_once()
 
-    @patch("src.markets.sources.akshare_source.AKShareSource.get_prices")
-    @patch("src.markets.sources.yfinance_source.YFinanceSource.get_prices")
+    @patch("hedge_fund.markets.sources.akshare_source.AKShareSource.get_prices")
+    @patch("hedge_fund.markets.sources.yfinance_source.YFinanceSource.get_prices")
     def test_get_prices_fallback(self, mock_yf_prices, mock_ak_prices):
         """Test fallback when primary source fails."""
         adapter = HKStockAdapter()
@@ -105,7 +105,7 @@ class TestHKStockAdapter:
         assert len(prices) > 0
         assert isinstance(prices[0], Price)
 
-    @patch("src.markets.sources.akshare_source.AKShareSource.get_financial_metrics")
+    @patch("hedge_fund.markets.sources.akshare_source.AKShareSource.get_financial_metrics")
     def test_get_financial_metrics(self, mock_get_metrics):
         """Test getting financial metrics."""
         adapter = HKStockAdapter()
@@ -128,8 +128,8 @@ class TestHKStockAdapter:
 
 
 class TestHKStockNewsNowIntegration:
-    @patch("src.markets.sources.akshare_news_source.AKShareNewsSource.get_company_news")
-    @patch("src.markets.sources.newsnow_source.NewsNowSource.get_company_news")
+    @patch("hedge_fund.markets.sources.akshare_news_source.AKShareNewsSource.get_company_news")
+    @patch("hedge_fund.markets.sources.newsnow_source.NewsNowSource.get_company_news")
     def test_get_company_news_uses_newsnow_first(self, mock_newsnow, mock_akshare):
         """Test that AKShareNews is used as primary news source, fallback to NewsNow."""
         adapter = HKStockAdapter()
@@ -148,16 +148,16 @@ class TestHKStockNewsNowIntegration:
 
 class TestHKAdapterIncludesXueqiu:
     def test_xueqiu_source_in_data_sources(self):
-        from src.markets.hk_stock import HKStockAdapter
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.hk_stock import HKStockAdapter
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
 
         adapter = HKStockAdapter()
         assert any(isinstance(s, XueqiuSource) for s in adapter.data_sources)
 
     def test_xueqiu_before_akshare_in_priority(self):
-        from src.markets.hk_stock import HKStockAdapter
-        from src.markets.sources.xueqiu_source import XueqiuSource
-        from src.markets.sources.akshare_source import AKShareSource
+        from hedge_fund.markets.hk_stock import HKStockAdapter
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.akshare_source import AKShareSource
 
         adapter = HKStockAdapter()
         names = [type(s).__name__ for s in adapter.data_sources]
@@ -166,9 +166,9 @@ class TestHKAdapterIncludesXueqiu:
 
 class TestHKAdapterNewsSourcePriority:
     def test_akshare_news_before_newsnow(self):
-        from src.markets.hk_stock import HKStockAdapter
-        from src.markets.sources.akshare_news_source import AKShareNewsSource
-        from src.markets.sources.newsnow_source import NewsNowSource
+        from hedge_fund.markets.hk_stock import HKStockAdapter
+        from hedge_fund.markets.sources.akshare_news_source import AKShareNewsSource
+        from hedge_fund.markets.sources.newsnow_source import NewsNowSource
 
         adapter = HKStockAdapter()
         names = [type(s).__name__ for s in adapter.news_sources]

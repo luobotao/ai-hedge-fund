@@ -2,8 +2,8 @@
 Test insider trading data retrieval functionality.
 """
 import pytest
-from src.markets.sources.akshare_source import AKShareSource
-from src.markets.hk_stock import HKStockAdapter
+from hedge_fund.markets.sources.akshare_source import AKShareSource
+from hedge_fund.markets.hk_stock import HKStockAdapter
 
 
 class TestInsiderTrades:
@@ -130,7 +130,7 @@ class TestInsiderTrades:
 
     def test_base_datasource_default_implementation(self):
         """Test that base DataSource has default implementation."""
-        from src.markets.sources.base import DataSource
+        from hedge_fund.markets.sources.base import DataSource
 
         # Create a minimal implementation
         class TestSource(DataSource):

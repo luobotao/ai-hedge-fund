@@ -1,7 +1,7 @@
 """Tests for settings module."""
 
 import pytest
-from src.config.settings import (
+from hedge_fund.config.settings import (
     Settings,
     DataSourceSettings,
     CacheSettings,

@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
 
-from src.markets.sources.eastmoney_source import EastmoneySource
+from hedge_fund.markets.sources.eastmoney_source import EastmoneySource
 
 
 class TestEastmoneySource:
@@ -143,7 +143,7 @@ class TestEastmoneySource:
         assert len(prices) == 1
         assert prices[0]['time'] == "2024-01-03T00:00:00Z"
 
-    @patch('src.markets.sources.eastmoney_source.requests.Session.get')
+    @patch('hedge_fund.markets.sources.eastmoney_source.requests.Session.get')
     def test_get_prices_success(self, mock_get):
         """Test successful price fetching."""
         source = EastmoneySource()
@@ -167,7 +167,7 @@ class TestEastmoneySource:
         assert prices[0]['open'] == 10.50
         assert prices[1]['open'] == 10.80
 
-    @patch('src.markets.sources.eastmoney_source.requests.Session.get')
+    @patch('hedge_fund.markets.sources.eastmoney_source.requests.Session.get')
     def test_get_prices_empty_response(self, mock_get):
         """Test price fetching with empty response."""
         source = EastmoneySource()
@@ -184,7 +184,7 @@ class TestEastmoneySource:
 
         assert prices == []
 
-    @patch('src.markets.sources.eastmoney_source.requests.Session.get')
+    @patch('hedge_fund.markets.sources.eastmoney_source.requests.Session.get')
     def test_get_prices_api_error(self, mock_get):
         """Test price fetching with API error."""
         source = EastmoneySource()
@@ -209,7 +209,7 @@ class TestEastmoneySource:
 
         assert prices == []
 
-    @patch('src.markets.sources.eastmoney_source.requests.Session.get')
+    @patch('hedge_fund.markets.sources.eastmoney_source.requests.Session.get')
     def test_get_financial_metrics_success(self, mock_get):
         """Test successful financial metrics fetching."""
         source = EastmoneySource()
@@ -238,7 +238,7 @@ class TestEastmoneySource:
         assert metrics['return_on_equity'] == 12.5
         assert metrics['gross_margin'] == 35.2
 
-    @patch('src.markets.sources.eastmoney_source.requests.Session.get')
+    @patch('hedge_fund.markets.sources.eastmoney_source.requests.Session.get')
     def test_get_financial_metrics_empty_response(self, mock_get):
         """Test financial metrics with empty response."""
         source = EastmoneySource()

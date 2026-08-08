@@ -1,7 +1,7 @@
 """Tests for NewsNowSource."""
 import pytest
 import requests_mock
-from src.markets.sources.newsnow_source import NewsNowSource
+from hedge_fund.markets.sources.newsnow_source import NewsNowSource
 
 
 class TestNewsNowSourceInit:

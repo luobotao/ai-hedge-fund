@@ -2,7 +2,7 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from src.markets.cn_stock import CNStockAdapter
+from hedge_fund.markets.cn_stock import CNStockAdapter
 
 
 class TestCNStockAdapterWithEastmoney:
@@ -34,7 +34,7 @@ class TestCNStockAdapterWithEastmoney:
             assert source_names[i] == expected_name, \
                 f"Expected {expected_name} at position {i}, got {source_names[i]}"
 
-    @patch('src.markets.sources.eastmoney_source.requests.Session.get')
+    @patch('hedge_fund.markets.sources.eastmoney_source.requests.Session.get')
     def test_get_prices_uses_eastmoney(self, mock_get):
         """Test that get_prices uses Eastmoney as primary source."""
         adapter = CNStockAdapter()
@@ -58,7 +58,7 @@ class TestCNStockAdapterWithEastmoney:
         # Verify Eastmoney API was called
         assert mock_get.called
 
-    @patch('src.markets.sources.eastmoney_source.requests.Session.get')
+    @patch('hedge_fund.markets.sources.eastmoney_source.requests.Session.get')
     def test_get_financial_metrics_uses_eastmoney(self, mock_get):
         """Test that get_financial_metrics uses Eastmoney as primary source."""
         adapter = CNStockAdapter()
@@ -82,7 +82,7 @@ class TestCNStockAdapterWithEastmoney:
         # Verify Eastmoney API was called
         assert mock_get.called
 
-    @patch('src.markets.sources.eastmoney_source.requests.Session.get')
+    @patch('hedge_fund.markets.sources.eastmoney_source.requests.Session.get')
     def test_fallback_when_eastmoney_fails(self, mock_get):
         """Test that adapter falls back to other sources when Eastmoney fails."""
         adapter = CNStockAdapter()

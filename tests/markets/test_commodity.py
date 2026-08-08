@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 import pandas as pd
 from datetime import datetime
-from src.markets.commodity import CommodityAdapter
+from hedge_fund.markets.commodity import CommodityAdapter
 
 
 @pytest.fixture
@@ -81,7 +81,7 @@ def test_supports_ticker_commodity():
 # ============== Step 2: 测试 get_prices ==============
 
 
-@patch("src.markets.commodity.yf.Ticker")
+@patch("hedge_fund.markets.commodity.yf.Ticker")
 def test_get_prices(mock_ticker_class, mock_yf_ticker):
     """测试获取商品期货价格数据"""
     mock_ticker_class.return_value = mock_yf_ticker
@@ -105,7 +105,7 @@ def test_get_prices(mock_ticker_class, mock_yf_ticker):
     assert prices[0]["volume"] == 50000
 
 
-@patch("src.markets.commodity.yf.Ticker")
+@patch("hedge_fund.markets.commodity.yf.Ticker")
 def test_get_prices_empty_result(mock_ticker_class):
     """测试价格数据为空的情况"""
     mock = MagicMock()
@@ -118,7 +118,7 @@ def test_get_prices_empty_result(mock_ticker_class):
     assert prices == []
 
 
-@patch("src.markets.commodity.yf.Ticker")
+@patch("hedge_fund.markets.commodity.yf.Ticker")
 def test_get_prices_exception(mock_ticker_class):
     """测试价格数据获取异常"""
     mock = MagicMock()
@@ -136,7 +136,7 @@ def test_get_prices_exception(mock_ticker_class):
 # ============== Step 3: 测试 get_company_news ==============
 
 
-@patch("src.markets.commodity.feedparser.parse")
+@patch("hedge_fund.markets.commodity.feedparser.parse")
 def test_get_company_news_gold(mock_feedparser, mock_feedparser_gold):
     """测试获取黄金期货新闻（通过Google News RSS）"""
     mock_feedparser.return_value = mock_feedparser_gold
@@ -158,7 +158,7 @@ def test_get_company_news_gold(mock_feedparser, mock_feedparser_gold):
     assert news[0]["sentiment"] is None
 
 
-@patch("src.markets.commodity.feedparser.parse")
+@patch("hedge_fund.markets.commodity.feedparser.parse")
 def test_get_company_news_with_limit(mock_feedparser, mock_feedparser_gold):
     """测试新闻数量限制"""
     mock_feedparser.return_value = mock_feedparser_gold
@@ -171,7 +171,7 @@ def test_get_company_news_with_limit(mock_feedparser, mock_feedparser_gold):
     assert news[0]["title"] == "Gold prices rise on inflation fears"
 
 
-@patch("src.markets.commodity.feedparser.parse")
+@patch("hedge_fund.markets.commodity.feedparser.parse")
 def test_get_company_news_silver(mock_feedparser):
     """测试获取白银期货新闻（验证商品名称提取）"""
     mock = MagicMock()
@@ -195,7 +195,7 @@ def test_get_company_news_silver(mock_feedparser):
     assert news[0]["title"] == "Silver market analysis"
 
 
-@patch("src.markets.commodity.feedparser.parse")
+@patch("hedge_fund.markets.commodity.feedparser.parse")
 def test_get_company_news_oil(mock_feedparser):
     """测试获取原油期货新闻（验证商品名称提取）"""
     mock = MagicMock()
@@ -218,7 +218,7 @@ def test_get_company_news_oil(mock_feedparser):
     assert len(news) == 1
 
 
-@patch("src.markets.commodity.feedparser.parse")
+@patch("hedge_fund.markets.commodity.feedparser.parse")
 def test_get_company_news_no_news(mock_feedparser):
     """测试无新闻的情况"""
     mock = MagicMock()
@@ -231,7 +231,7 @@ def test_get_company_news_no_news(mock_feedparser):
     assert news == []
 
 
-@patch("src.markets.commodity.feedparser.parse")
+@patch("hedge_fund.markets.commodity.feedparser.parse")
 def test_get_company_news_exception(mock_feedparser):
     """测试新闻获取异常（应返回空列表）"""
     mock_feedparser.side_effect = Exception("RSS parse error")
@@ -243,7 +243,7 @@ def test_get_company_news_exception(mock_feedparser):
     assert news == []
 
 
-@patch("src.markets.commodity.feedparser.parse")
+@patch("hedge_fund.markets.commodity.feedparser.parse")
 def test_get_company_news_invalid_ticker(mock_feedparser):
     """测试不支持的ticker格式"""
     adapter = CommodityAdapter()

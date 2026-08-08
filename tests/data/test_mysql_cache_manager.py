@@ -7,9 +7,9 @@ import pytest
 from datetime import datetime, date, timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from src.data.mysql_cache import MySQLCacheManager
-from src.data.models import Price, FinancialMetrics, CompanyNews
-import src.data.database as _db_module
+from hedge_fund.data.mysql_cache import MySQLCacheManager
+from hedge_fund.data.models import Price, FinancialMetrics, CompanyNews
+import hedge_fund.data.database as _db_module
 
 
 @pytest.fixture

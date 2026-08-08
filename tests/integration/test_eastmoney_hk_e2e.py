@@ -4,7 +4,7 @@ These tests hit the real Eastmoney API. Run only when internet is available.
 Mark with pytest.mark.integration to skip in CI if needed.
 """
 import pytest
-from src.markets.sources.eastmoney_source import EastmoneySource
+from hedge_fund.markets.sources.eastmoney_source import EastmoneySource
 
 
 @pytest.mark.integration

@@ -5,7 +5,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 import pandas as pd
 from datetime import datetime
-from src.markets.hk_stock import HKStockAdapter
+from hedge_fund.markets.hk_stock import HKStockAdapter
 
 
 @pytest.fixture
@@ -49,7 +49,7 @@ def test_supports_ticker_hk_stock():
 # ============== Step 6: 测试 get_prices ==============
 
 
-@patch("src.markets.hk_stock.yf.Ticker")
+@patch("hedge_fund.markets.hk_stock.yf.Ticker")
 def test_get_prices(mock_ticker_class, mock_yf_ticker):
     """测试获取港股价格数据"""
     mock_ticker_class.return_value = mock_yf_ticker
@@ -71,7 +71,7 @@ def test_get_prices(mock_ticker_class, mock_yf_ticker):
     assert prices[0]["volume"] == 1000000
 
 
-@patch("src.markets.hk_stock.yf.Ticker")
+@patch("hedge_fund.markets.hk_stock.yf.Ticker")
 def test_get_prices_empty_result(mock_ticker_class):
     """测试价格数据为空的情况"""
     mock = MagicMock()
@@ -87,7 +87,7 @@ def test_get_prices_empty_result(mock_ticker_class):
 # ============== Step 9: 测试 get_company_news ==============
 
 
-@patch("src.markets.hk_stock.yf.Ticker")
+@patch("hedge_fund.markets.hk_stock.yf.Ticker")
 def test_get_company_news(mock_ticker_class, mock_yf_ticker):
     """测试获取港股新闻"""
     mock_ticker_class.return_value = mock_yf_ticker
@@ -104,7 +104,7 @@ def test_get_company_news(mock_ticker_class, mock_yf_ticker):
     assert news[0]["sentiment"] is None
 
 
-@patch("src.markets.hk_stock.yf.Ticker")
+@patch("hedge_fund.markets.hk_stock.yf.Ticker")
 def test_get_company_news_with_limit(mock_ticker_class, mock_yf_ticker):
     """测试新闻数量限制"""
     mock_ticker_class.return_value = mock_yf_ticker
@@ -117,7 +117,7 @@ def test_get_company_news_with_limit(mock_ticker_class, mock_yf_ticker):
     assert news[0]["title"] == "Test News 1"
 
 
-@patch("src.markets.hk_stock.yf.Ticker")
+@patch("hedge_fund.markets.hk_stock.yf.Ticker")
 def test_get_company_news_no_news(mock_ticker_class):
     """测试无新闻的情况"""
     mock = MagicMock()
@@ -133,7 +133,7 @@ def test_get_company_news_no_news(mock_ticker_class):
 # ============== Step 12: 测试 get_financial_metrics ==============
 
 
-@patch("src.markets.hk_stock.yf.Ticker")
+@patch("hedge_fund.markets.hk_stock.yf.Ticker")
 def test_get_financial_metrics(mock_ticker_class, mock_yf_ticker):
     """测试获取港股财务指标"""
     mock_ticker_class.return_value = mock_yf_ticker
@@ -149,7 +149,7 @@ def test_get_financial_metrics(mock_ticker_class, mock_yf_ticker):
     assert metrics["net_profit"] == 1000000000
 
 
-@patch("src.markets.hk_stock.yf.Ticker")
+@patch("hedge_fund.markets.hk_stock.yf.Ticker")
 def test_get_financial_metrics_missing_fields(mock_ticker_class):
     """测试财务指标字段缺失"""
     mock = MagicMock()
@@ -170,7 +170,7 @@ def test_get_financial_metrics_missing_fields(mock_ticker_class):
     assert metrics["net_profit"] == 0
 
 
-@patch("src.markets.hk_stock.yf.Ticker")
+@patch("hedge_fund.markets.hk_stock.yf.Ticker")
 def test_get_financial_metrics_exception(mock_ticker_class):
     """测试财务数据获取异常"""
     # 让Ticker构造函数抛出异常

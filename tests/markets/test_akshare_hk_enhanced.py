@@ -1,7 +1,7 @@
 """Tests for enhanced AKShare HK financial metrics."""
 import pytest
 from unittest.mock import Mock, patch, MagicMock
-from src.markets.sources.akshare_source import AKShareSource
+from hedge_fund.markets.sources.akshare_source import AKShareSource
 import pandas as pd
 
 

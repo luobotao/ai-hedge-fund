@@ -6,8 +6,8 @@ API集成测试 - 验证多市场支持
 """
 import pytest
 from unittest.mock import patch, MagicMock
-from src.tools import api
-from src.data.models import Price, FinancialMetrics, CompanyNews
+from hedge_fund.tools import api
+from hedge_fund.data.models import Price, FinancialMetrics, CompanyNews
 
 
 class TestMultiMarketIntegration:
@@ -149,10 +149,10 @@ class TestMarketRouterFallback:
 class TestSearchLineItemsNonUS:
     """Tests for search_line_items with HK/CN stocks returning historical data."""
 
-    @patch('src.tools.api._get_market_router')
+    @patch('hedge_fund.tools.api._get_market_router')
     def test_hk_search_line_items_annual_returns_multiple_years(self, mock_router):
         """search_line_items for HK stock with period=annual returns multiple LineItems."""
-        from src.tools.api import search_line_items
+        from hedge_fund.tools.api import search_line_items
 
         mock_adapter = MagicMock()
         mock_adapter.get_historical_financial_metrics.return_value = [
@@ -197,10 +197,10 @@ class TestSearchLineItemsNonUS:
         assert abs(results[0].revenue - 337e9) < 1e6
         assert abs(results[1].revenue - 276e9) < 1e6
 
-    @patch('src.tools.api._get_market_router')
+    @patch('hedge_fund.tools.api._get_market_router')
     def test_hk_search_line_items_ttm_uses_adapter_get_financial_metrics(self, mock_router):
         """search_line_items for HK stock with period=ttm uses adapter.get_financial_metrics."""
-        from src.tools.api import search_line_items
+        from hedge_fund.tools.api import search_line_items
 
         mock_adapter = MagicMock()
         mock_adapter.get_financial_metrics.return_value = {

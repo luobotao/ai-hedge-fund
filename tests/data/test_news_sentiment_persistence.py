@@ -3,8 +3,8 @@ import pytest
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from src.data.database import Base
-from src.data.mysql_models import CompanyNewsItem
+from hedge_fund.data.database import Base
+from hedge_fund.data.mysql_models import CompanyNewsItem
 
 
 @pytest.fixture
@@ -60,10 +60,10 @@ def test_company_news_item_sentiment_persistence(db_session):
 
 
 import os
-from src.data.models import CompanyNews
-from src.data.mysql_cache import MySQLCacheManager
-import src.data.mysql_cache as _mc_module
-import src.data.database as _db_module
+from hedge_fund.data.models import CompanyNews
+from hedge_fund.data.mysql_cache import MySQLCacheManager
+import hedge_fund.data.mysql_cache as _mc_module
+import hedge_fund.data.database as _db_module
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -88,7 +88,7 @@ def cache():
     _db_module.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
     # Import models and create tables
-    from src.data.mysql_models import CompanyNewsItem
+    from hedge_fund.data.mysql_models import CompanyNewsItem
     _db_module.Base.metadata.create_all(bind=test_engine)
 
     # Create the cache manager
@@ -194,7 +194,7 @@ def _make_news(title: str, sentiment=None) -> CompanyNews:
 
 def test_news_sentiment_agent_writes_back_to_cache():
     """After LLM analysis, news_sentiment_agent should persist enriched news to cache."""
-    from src.agents.news_sentiment import news_sentiment_agent
+    from hedge_fund.agents.news_sentiment import news_sentiment_agent
 
     mock_news = [_make_news("美团Q4业绩超预期"), _make_news("港股下跌")]
 
@@ -214,9 +214,9 @@ def test_news_sentiment_agent_writes_back_to_cache():
 
     mock_dual_cache = MagicMock()
 
-    with patch("src.agents.news_sentiment.get_company_news", return_value=mock_news), \
-         patch("src.agents.news_sentiment.call_llm", return_value=mock_sentiment_response), \
-         patch("src.agents.news_sentiment._get_dual_cache", return_value=mock_dual_cache):
+    with patch("hedge_fund.agents.news_sentiment.get_company_news", return_value=mock_news), \
+         patch("hedge_fund.agents.news_sentiment.call_llm", return_value=mock_sentiment_response), \
+         patch("hedge_fund.agents.news_sentiment._get_dual_cache", return_value=mock_dual_cache):
 
         news_sentiment_agent(state)
 

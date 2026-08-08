@@ -2,7 +2,7 @@
 import pytest
 from datetime import datetime
 
-from src.markets.hk_stock import HKStockAdapter
+from hedge_fund.markets.hk_stock import HKStockAdapter
 
 
 @pytest.fixture

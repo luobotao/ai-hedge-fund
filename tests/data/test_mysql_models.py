@@ -7,8 +7,8 @@ import pytest
 from datetime import datetime, date
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from src.data.database import Base
-from src.data.mysql_models import StockPrice, FinancialMetric, CompanyNewsItem
+from hedge_fund.data.database import Base
+from hedge_fund.data.mysql_models import StockPrice, FinancialMetric, CompanyNewsItem
 
 
 @pytest.fixture

@@ -1,6 +1,6 @@
 """Tests for data validation."""
 import pytest
-from src.data.validation import DataValidator
+from hedge_fund.data.validation import DataValidator
 
 
 class TestDataValidator:

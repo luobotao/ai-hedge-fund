@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from src.markets.sources.xueqiu_source import XueqiuSource
+from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
 
 
 class TestXueqiuSourceInit:
@@ -520,9 +520,9 @@ class TestXueqiuSourceHistoricalData:
             "clia": [equity * 0.3, None],
         }
 
-    @patch('src.markets.sources.xueqiu_source.XueqiuSource._fetch_financial_data_multi')
-    @patch('src.markets.sources.xueqiu_source.XueqiuSource._fetch_quote_valuation')
-    @patch('src.markets.sources.xueqiu_source.XueqiuSource._ensure_token')
+    @patch('hedge_fund.markets.sources.xueqiu_source.XueqiuSource._fetch_financial_data_multi')
+    @patch('hedge_fund.markets.sources.xueqiu_source.XueqiuSource._fetch_quote_valuation')
+    @patch('hedge_fund.markets.sources.xueqiu_source.XueqiuSource._ensure_token')
     def test_get_historical_hk_returns_multiple_years(
         self, mock_token, mock_quote, mock_fetch_multi
     ):
@@ -559,7 +559,7 @@ class TestXueqiuSourceHistoricalData:
 
         mock_fetch_multi.side_effect = fake_fetch_multi
 
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         results = source.get_historical_financial_data("03690", limit=5)
 
@@ -573,9 +573,9 @@ class TestXueqiuSourceHistoricalData:
         assert abs(results[1]["revenue"] - 276e9) < 1e6
         assert results[0]["return_on_equity"] == pytest.approx(0.22, abs=0.001)
 
-    @patch('src.markets.sources.xueqiu_source.XueqiuSource._fetch_financial_data_multi')
-    @patch('src.markets.sources.xueqiu_source.XueqiuSource._fetch_quote_valuation')
-    @patch('src.markets.sources.xueqiu_source.XueqiuSource._ensure_token')
+    @patch('hedge_fund.markets.sources.xueqiu_source.XueqiuSource._fetch_financial_data_multi')
+    @patch('hedge_fund.markets.sources.xueqiu_source.XueqiuSource._fetch_quote_valuation')
+    @patch('hedge_fund.markets.sources.xueqiu_source.XueqiuSource._ensure_token')
     def test_get_historical_respects_limit(
         self, mock_token, mock_quote, mock_fetch_multi
     ):
@@ -592,20 +592,20 @@ class TestXueqiuSourceHistoricalData:
 
         mock_fetch_multi.side_effect = fake_fetch_multi
 
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         results = source.get_historical_financial_data("03690", limit=3)
 
         assert len(results) == 3
 
-    @patch('src.markets.sources.xueqiu_source.XueqiuSource._fetch_financial_data_multi')
-    @patch('src.markets.sources.xueqiu_source.XueqiuSource._ensure_token')
+    @patch('hedge_fund.markets.sources.xueqiu_source.XueqiuSource._fetch_financial_data_multi')
+    @patch('hedge_fund.markets.sources.xueqiu_source.XueqiuSource._ensure_token')
     def test_get_historical_returns_none_on_no_data(self, mock_token, mock_fetch_multi):
         """Returns None when all fetches fail."""
         mock_token.return_value = True
         mock_fetch_multi.return_value = []
 
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         result = source.get_historical_financial_data("03690", limit=5)
         assert result is None
@@ -615,7 +615,7 @@ class TestXueqiuDerivedMetrics:
     """Tests for computed derived metrics in _compute_derived_metrics."""
 
     def test_free_cash_flow_yield(self):
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         metrics = {
             "free_cash_flow": 43e9,
@@ -625,7 +625,7 @@ class TestXueqiuDerivedMetrics:
         assert metrics["free_cash_flow_yield"] == pytest.approx(43e9 / 450e9, rel=1e-4)
 
     def test_free_cash_flow_per_share(self):
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         metrics = {
             "free_cash_flow": 43e9,
@@ -635,7 +635,7 @@ class TestXueqiuDerivedMetrics:
         assert metrics["free_cash_flow_per_share"] == pytest.approx(43e9 / 6174383320.0, rel=1e-4)
 
     def test_price_to_sales_ratio(self):
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         metrics = {
             "market_cap": 450e9,
@@ -645,7 +645,7 @@ class TestXueqiuDerivedMetrics:
         assert metrics["price_to_sales_ratio"] == pytest.approx(450e9 / 337e9, rel=1e-4)
 
     def test_enterprise_value(self):
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         metrics = {
             "market_cap": 450e9,
@@ -656,7 +656,7 @@ class TestXueqiuDerivedMetrics:
         assert metrics["enterprise_value"] == pytest.approx(450e9 + 303e9 - 90e9, rel=1e-4)
 
     def test_enterprise_value_to_revenue(self):
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         metrics = {
             "market_cap": 450e9,
@@ -669,7 +669,7 @@ class TestXueqiuDerivedMetrics:
         assert metrics["enterprise_value_to_revenue_ratio"] == pytest.approx(ev / 337e9, rel=1e-4)
 
     def test_peg_ratio_positive_growth(self):
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         metrics = {
             "price_to_earnings_ratio": 20.0,
@@ -680,7 +680,7 @@ class TestXueqiuDerivedMetrics:
         assert metrics["peg_ratio"] == pytest.approx(0.8, rel=1e-4)
 
     def test_peg_ratio_skipped_for_negative_growth(self):
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         metrics = {
             "price_to_earnings_ratio": 20.0,
@@ -690,7 +690,7 @@ class TestXueqiuDerivedMetrics:
         assert metrics.get("peg_ratio") is None
 
     def test_roic(self):
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         metrics = {
             "operating_income": 37e9,
@@ -705,7 +705,7 @@ class TestXueqiuDerivedMetrics:
         assert metrics["return_on_invested_capital"] == pytest.approx(expected_roic, rel=1e-4)
 
     def test_debt_to_equity_direct(self):
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         metrics = {
             "total_liabilities": 303e9,
@@ -716,7 +716,7 @@ class TestXueqiuDerivedMetrics:
         assert metrics["debt_to_equity"] == pytest.approx(303e9 / 172e9, rel=1e-4)
 
     def test_skips_when_missing_inputs(self):
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
         metrics = {}
         source._compute_derived_metrics(metrics)
@@ -816,7 +816,7 @@ class TestXueqiuYoYGrowth:
 
     def test_hk_earnings_growth_yoy_positive(self):
         """earnings_growth is YoY: (current - prior) / abs(prior)."""
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
 
         current_income = {"ploashh": [35e9, None], "tto": [337e9, None]}
@@ -831,7 +831,7 @@ class TestXueqiuYoYGrowth:
 
     def test_hk_revenue_growth_yoy(self):
         """revenue_growth is YoY: (current_rev - prior_rev) / abs(prior_rev)."""
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
 
         current_income = {"ploashh": [35e9, None], "tto": [337e9, None]}
@@ -846,7 +846,7 @@ class TestXueqiuYoYGrowth:
 
     def test_hk_growth_none_when_no_prior(self):
         """earnings_growth and revenue_growth are None when prior_income not provided."""
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
 
         current_income = {"ploashh": [35e9, None], "tto": [337e9, None]}
@@ -857,7 +857,7 @@ class TestXueqiuYoYGrowth:
 
     def test_hk_growth_handles_prior_zero_revenue(self):
         """revenue_growth is None when prior revenue is 0."""
-        from src.markets.sources.xueqiu_source import XueqiuSource
+        from hedge_fund.markets.sources.xueqiu_source import XueqiuSource
         source = XueqiuSource()
 
         current_income = {"ploashh": [35e9, None], "tto": [337e9, None]}

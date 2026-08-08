@@ -3,8 +3,8 @@ USStockAdapter (美股适配器) 单元测试
 """
 import pytest
 from unittest.mock import patch, MagicMock
-from src.markets.us_stock import USStockAdapter
-from src.data.models import Price, FinancialMetrics, CompanyNews
+from hedge_fund.markets.us_stock import USStockAdapter
+from hedge_fund.data.models import Price, FinancialMetrics, CompanyNews
 
 
 @pytest.fixture
@@ -132,7 +132,7 @@ def test_supports_ticker_us_stock():
 
 # ============== Step 6: 测试 get_prices ==============
 
-@patch('src.markets.us_stock.api.get_prices')
+@patch('hedge_fund.markets.us_stock.api.get_prices')
 def test_get_prices(mock_api_get_prices, mock_api_prices):
     """测试获取美股价格数据"""
     mock_api_get_prices.return_value = mock_api_prices
@@ -157,7 +157,7 @@ def test_get_prices(mock_api_get_prices, mock_api_prices):
     assert prices[0]["volume"] == 1000000
 
 
-@patch('src.markets.us_stock.api.get_prices')
+@patch('hedge_fund.markets.us_stock.api.get_prices')
 def test_get_prices_empty_result(mock_api_get_prices):
     """测试价格数据为空的情况"""
     mock_api_get_prices.return_value = []
@@ -170,7 +170,7 @@ def test_get_prices_empty_result(mock_api_get_prices):
 
 # ============== Step 9: 测试 get_company_news ==============
 
-@patch('src.markets.us_stock.api.get_company_news')
+@patch('hedge_fund.markets.us_stock.api.get_company_news')
 def test_get_company_news(mock_api_news, mock_api_company_news):
     """测试获取美股新闻"""
     mock_api_news.return_value = mock_api_company_news
@@ -194,7 +194,7 @@ def test_get_company_news(mock_api_news, mock_api_company_news):
     assert news[0]["sentiment"] == "positive"
 
 
-@patch('src.markets.us_stock.api.get_company_news')
+@patch('hedge_fund.markets.us_stock.api.get_company_news')
 def test_get_company_news_empty_result(mock_api_news):
     """测试新闻为空的情况"""
     mock_api_news.return_value = []
@@ -205,7 +205,7 @@ def test_get_company_news_empty_result(mock_api_news):
     assert news == []
 
 
-@patch('src.markets.us_stock.api.get_company_news')
+@patch('hedge_fund.markets.us_stock.api.get_company_news')
 def test_get_company_news_with_limit(mock_api_news, mock_api_company_news):
     """测试新闻数量限制"""
     mock_api_news.return_value = mock_api_company_news
@@ -223,7 +223,7 @@ def test_get_company_news_with_limit(mock_api_news, mock_api_company_news):
 
 # ============== Step 12: 测试 get_financial_metrics ==============
 
-@patch('src.markets.us_stock.api.get_financial_metrics')
+@patch('hedge_fund.markets.us_stock.api.get_financial_metrics')
 def test_get_financial_metrics(mock_api_metrics, mock_api_financial_metrics):
     """测试获取美股财务指标"""
     mock_api_metrics.return_value = mock_api_financial_metrics
@@ -245,7 +245,7 @@ def test_get_financial_metrics(mock_api_metrics, mock_api_financial_metrics):
     assert "net_profit" in metrics
 
 
-@patch('src.markets.us_stock.api.get_financial_metrics')
+@patch('hedge_fund.markets.us_stock.api.get_financial_metrics')
 def test_get_financial_metrics_empty_result(mock_api_metrics):
     """测试财务指标为空的情况"""
     mock_api_metrics.return_value = []
@@ -256,7 +256,7 @@ def test_get_financial_metrics_empty_result(mock_api_metrics):
     assert metrics == {}
 
 
-@patch('src.markets.us_stock.api.get_financial_metrics')
+@patch('hedge_fund.markets.us_stock.api.get_financial_metrics')
 def test_get_financial_metrics_missing_fields(mock_api_metrics):
     """测试财务指标字段缺失"""
     # 创建缺少部分字段的metrics（pb_ratio为None）

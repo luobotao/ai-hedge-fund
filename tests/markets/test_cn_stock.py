@@ -4,7 +4,7 @@ CNStockAdapter (A股适配器) 单元测试
 import pytest
 from unittest.mock import patch, MagicMock
 import pandas as pd
-from src.markets.cn_stock import CNStockAdapter
+from hedge_fund.markets.cn_stock import CNStockAdapter
 
 
 @pytest.fixture
@@ -210,8 +210,8 @@ def test_get_company_news_eastmoney(mock_news_em):
     mock_news_em.assert_called_once_with(symbol="600000")
 
 
-@patch('src.markets.cn_stock.feedparser.parse')
-@patch('src.markets.cn_stock.ak.stock_news_em')
+@patch('hedge_fund.markets.cn_stock.feedparser.parse')
+@patch('hedge_fund.markets.cn_stock.ak.stock_news_em')
 def test_get_company_news_fallback_to_google(mock_news_em, mock_parse):
     """测试新闻获取降级到Google News"""
     # 东方财富失败

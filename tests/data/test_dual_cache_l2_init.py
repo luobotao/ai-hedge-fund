@@ -9,7 +9,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import src.data.database as _db_module
+import hedge_fund.data.database as _db_module
 
 
 @pytest.fixture
@@ -32,7 +32,7 @@ def sqlite_db():
 class TestDualCacheL2Init:
     def test_l2_cache_initializes_when_database_url_set(self, sqlite_db):
         """L2 cache must be non-None when DATABASE_URL is set and DB is reachable."""
-        from src.data.dual_cache import DualLayerCacheManager
+        from hedge_fund.data.dual_cache import DualLayerCacheManager
 
         with patch.dict(os.environ, {"DATABASE_URL": "sqlite:///:memory:"}):
             cache = DualLayerCacheManager(enable_l2=True)

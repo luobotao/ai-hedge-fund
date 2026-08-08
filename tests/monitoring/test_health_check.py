@@ -2,7 +2,7 @@
 
 import pytest
 from datetime import datetime
-from src.monitoring.health_check import DataSourceHealthChecker, HealthStatus
+from hedge_fund.monitoring.health_check import DataSourceHealthChecker, HealthStatus
 
 
 class MockDataSource:

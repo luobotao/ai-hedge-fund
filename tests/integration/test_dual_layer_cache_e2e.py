@@ -10,12 +10,12 @@ from unittest.mock import patch, MagicMock
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.tools.api import get_prices, get_financial_metrics, get_company_news
-from src.data.dual_cache import get_dual_cache
-from src.data.cache import get_cache
-from src.data.mysql_cache import MySQLCacheManager
-from src.data.models import Price, FinancialMetrics, CompanyNews
-import src.data.database as _db_module
+from hedge_fund.tools.api import get_prices, get_financial_metrics, get_company_news
+from hedge_fund.data.dual_cache import get_dual_cache
+from hedge_fund.data.cache import get_cache
+from hedge_fund.data.mysql_cache import MySQLCacheManager
+from hedge_fund.data.models import Price, FinancialMetrics, CompanyNews
+import hedge_fund.data.database as _db_module
 
 
 @pytest.mark.integration
@@ -46,11 +46,11 @@ def clean_test_env():
     l1_cache.clear()
 
     # Reset global dual cache to force re-initialization
-    import src.data.dual_cache as dual_cache_module
+    import hedge_fund.data.dual_cache as dual_cache_module
     dual_cache_module._dual_cache = None
 
     # Create fresh dual cache instance with L2 enabled
-    from src.data.dual_cache import DualLayerCacheManager
+    from hedge_fund.data.dual_cache import DualLayerCacheManager
     dual_cache = DualLayerCacheManager(enable_l2=True)
 
     # Update global instance
@@ -171,7 +171,7 @@ class TestDualLayerCacheE2E:
         l1_cache = get_cache()
         l1_cache.clear()
 
-        with patch('src.tools.api._make_api_request') as mock_request:
+        with patch('hedge_fund.tools.api._make_api_request') as mock_request:
             # Mock API response
             mock_response = MagicMock()
             mock_response.status_code = 200
@@ -257,7 +257,7 @@ class TestDualLayerCacheE2E:
         """Test cache hit rate statistics."""
         dual_cache = clean_test_env
 
-        with patch('src.tools.api._make_api_request') as mock_request:
+        with patch('hedge_fund.tools.api._make_api_request') as mock_request:
             # Mock API response
             mock_response = MagicMock()
             mock_response.status_code = 200

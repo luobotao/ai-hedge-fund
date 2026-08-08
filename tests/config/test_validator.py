@@ -1,8 +1,8 @@
 """Tests for configuration validator."""
 
 import pytest
-from src.config.settings import Settings, DataSourceSettings, CacheSettings, MonitoringSettings
-from src.config.validator import validate_settings, validate_and_raise
+from hedge_fund.config.settings import Settings, DataSourceSettings, CacheSettings, MonitoringSettings
+from hedge_fund.config.validator import validate_settings, validate_and_raise
 
 
 class TestValidateSettings:

@@ -9,8 +9,8 @@
 """
 import pytest
 from datetime import datetime, timedelta
-from src.tools import api
-from src.data.models import Price, CompanyNews, FinancialMetrics
+from hedge_fund.tools import api
+from hedge_fund.data.models import Price, CompanyNews, FinancialMetrics
 
 
 @pytest.mark.integration

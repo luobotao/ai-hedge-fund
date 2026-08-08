@@ -1,4 +1,4 @@
-from src.data.models import FinancialMetrics
+from hedge_fund.data.models import FinancialMetrics
 
 
 def test_financial_metrics_has_cash_flow_fields():

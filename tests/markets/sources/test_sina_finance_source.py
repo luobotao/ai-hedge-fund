@@ -1,7 +1,7 @@
 """Tests for SinaFinanceSource."""
 import pytest
 import re
-from src.markets.sources.sina_finance_source import SinaFinanceSource
+from hedge_fund.markets.sources.sina_finance_source import SinaFinanceSource
 
 
 class TestSinaFinanceSourceInit:

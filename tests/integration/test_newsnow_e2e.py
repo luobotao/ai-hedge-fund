@@ -1,8 +1,8 @@
 """End-to-end tests for NewsNow integration."""
 import pytest
-from src.markets.us_stock import USStockAdapter
-from src.markets.cn_stock import CNStockAdapter
-from src.markets.hk_stock import HKStockAdapter
+from hedge_fund.markets.us_stock import USStockAdapter
+from hedge_fund.markets.cn_stock import CNStockAdapter
+from hedge_fund.markets.hk_stock import HKStockAdapter
 
 
 class TestNewsNowE2E:
